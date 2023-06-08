@@ -1,48 +1,31 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class OPT extends ReplacementAlgorithm{
+class OPT extends ReplacementAlgorithm {
     private List<Integer> pageList;
-    private int pageFaultCount;
 
     public OPT(int pageFrameCount) {
         super(pageFrameCount);
-        pageList = new ArrayList<>(pageFrameCount);
-        this.pageFaultCount = 0;
+        this.pageList = new ArrayList<>(pageFrameCount);
     }
 
-    public void insert(int[] pageReferenceString) {
-        for (int pageNumber : pageReferenceString) {
-            if (!pageList.contains(pageNumber)) {
-                pageFaultCount++;
-                if (pageList.size() >= pageList.size()) {
-                    int index = findOptimalIndex(pageNumber, pageReferenceString);
-                    pageList.set(index, pageNumber);
-                } else {
-                    pageList.add(pageNumber);
-                }
+    public void insert(int pageNumber) {
+        if (!pageList.contains(pageNumber)) {
+            pageFaultCount++;
+            if (pageList.size() >= pageFrameCount) {
+                int index = findOptimalIndex(pageList);
+                pageList.set(index, pageNumber);
+            } else {
+                pageList.add(pageNumber);
             }
         }
     }
 
-    public int getPageFaultCount() {
-        return pageFaultCount;
-    }
-
-    @Override
-    public void insert(int pageNumber) {
-
-    }
-
-    private int findOptimalIndex(int pageNumber, int[] pageReferenceString) {
+    private int findOptimalIndex(List<Integer> pageList) {
         int index = -1;
         int farthestPage = Integer.MIN_VALUE;
         for (int i = 0; i < pageList.size(); i++) {
             int currentPage = pageList.get(i);
-            if (!isPageExist(pageNumber, i, pageReferenceString)) {
-                return i;
-            }
-            int nextPageIndex = findNextAppearanceIndex(pageNumber, i, pageReferenceString);
+            int nextPageIndex = findNextAppearanceIndex(currentPage);
             if (nextPageIndex == -1) {
                 return i;
             }
@@ -54,18 +37,9 @@ public class OPT extends ReplacementAlgorithm{
         return index;
     }
 
-    private boolean isPageExist(int pageNumber, int currentIndex, int[] pageReferenceString) {
-        for (int i = currentIndex + 1; i < pageReferenceString.length; i++) {
-            if (pageReferenceString[i] == pageNumber) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int findNextAppearanceIndex(int pageNumber, int currentIndex, int[] pageReferenceString) {
-        for (int i = currentIndex + 1; i < pageReferenceString.length; i++) {
-            if (pageReferenceString[i] == pageNumber) {
+    private int findNextAppearanceIndex(int pageNumber) {
+        for (int i = pageFaultCount; i < pageList.size(); i++) {
+            if (pageList.get(i) == pageNumber) {
                 return i;
             }
         }

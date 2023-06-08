@@ -1,25 +1,24 @@
 import java.util.*;
 
-public class FIFO extends ReplacementAlgorithm {
+class FIFO extends ReplacementAlgorithm {
     private Queue<Integer> pageQueue;
+    private Set<Integer> pageSet;
 
     public FIFO(int pageFrameCount) {
         super(pageFrameCount);
-        pageQueue = new LinkedList<>();
+        this.pageQueue = new LinkedList<>();
+        this.pageSet = new HashSet<>();
     }
 
-    @Override
     public void insert(int pageNumber) {
-        if (!pageQueue.contains(pageNumber)) {
+        if (!pageSet.contains(pageNumber)) {
             pageFaultCount++;
-            if (pageQueue.size() >= pageFrameCount) {
+            if (pageQueue.size() == pageFrameCount) {
                 int removedPage = pageQueue.poll();
-                System.out.println("Page " + removedPage + " removed from the page frame.");
+                pageSet.remove(removedPage);
             }
             pageQueue.offer(pageNumber);
-            System.out.println("Page " + pageNumber + " inserted into the page frame.");
+            pageSet.add(pageNumber);
         }
     }
-
 }
-
