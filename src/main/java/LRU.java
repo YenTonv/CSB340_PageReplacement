@@ -1,26 +1,24 @@
 import java.util.*;
 
-public class LRU extends ReplacementAlgorithm {
+class LRU extends ReplacementAlgorithm {
     private LinkedHashMap<Integer, Integer> pageMap;
 
     public LRU(int pageFrameCount) {
         super(pageFrameCount);
-        pageMap = new LinkedHashMap<>(pageFrameCount, 0.75f, true);
+        this.pageMap = new LinkedHashMap<>();
     }
 
-    @Override
     public void insert(int pageNumber) {
-        if (!pageMap.containsKey(pageNumber)) {
-            pageFaultCount++;
-            if (pageMap.size() >= pageFrameCount) {
-                Iterator<Integer> iterator = pageMap.keySet().iterator();
-                iterator.next();
-                iterator.remove();
-            }
+        if (pageMap.containsKey(pageNumber)) {
+            int count = pageMap.remove(pageNumber);
+            pageMap.put(pageNumber, count);
         } else {
-            pageMap.remove(pageNumber);
+            pageFaultCount++;
+            if (pageMap.size() == pageFrameCount) {
+                int removedPage = pageMap.keySet().iterator().next();
+                pageMap.remove(removedPage);
+            }
+            pageMap.put(pageNumber, pageFaultCount);
         }
-        pageMap.put(pageNumber, pageNumber);
     }
-
 }
