@@ -8,28 +8,32 @@ public class Main {
      */
     public static void main(String[] args) {
         int pageFrameCount = 3;
-
         PageGenerator pageGenerator = new PageGenerator();
-        int[] referenceString = pageGenerator.getReferenceString();
 
-        FIFO fifo = new FIFO(pageFrameCount);
-        LRU lru = new LRU(pageFrameCount);
-        OPT opt = new OPT(pageFrameCount, referenceString);
+        int[][] referenceStrings = new int[3][];
+        FIFO[] fifos = new FIFO[3];
+        LRU[] lrus = new LRU[3];
+        OPT[] opts = new OPT[3];
 
-        processReferenceString(referenceString, fifo, lru, opt);
-
-        int fifoPageFaultCount = fifo.getPageFaultCount();
-        int lruPageFaultCount = lru.getPageFaultCount();
-        int optPageFaultCount = opt.getPageFaultCount();
+        for (int i = 0; i < 3; i++) {
+            referenceStrings[i] = pageGenerator.getReferenceString(i + 1);
+            fifos[i] = new FIFO(pageFrameCount);
+            lrus[i] = new LRU(pageFrameCount);
+            opts[i] = new OPT(pageFrameCount, referenceStrings[i]);
+            processReferenceString(referenceStrings[i], fifos[i], lrus[i], opts[i]);
+        }
 
         System.out.println("Page Fault Counts:");
-        System.out.println("FIFO: " + fifoPageFaultCount);
-        System.out.println("LRU: " + lruPageFaultCount);
-        System.out.println("OPT: " + optPageFaultCount);
-
-        String bestAlgorithm = determineBestAlgorithm(fifoPageFaultCount, lruPageFaultCount, optPageFaultCount);
-        System.out.println(bestAlgorithm + " performed the best.");
-        System.out.println();
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Reference String " + (i + 1) + ":");
+            System.out.println("FIFO: " + fifos[i].getPageFaultCount());
+            System.out.println("LRU: " + lrus[i].getPageFaultCount());
+            System.out.println("OPT: " + opts[i].getPageFaultCount());
+            System.out.println("Best Algorithms:");
+            String bestAlgorithm = determineBestAlgorithm(fifos[i].getPageFaultCount(), lrus[i].getPageFaultCount(), opts[i].getPageFaultCount());
+            System.out.println("Reference String " + (i + 1) + ": " + bestAlgorithm);
+            System.out.println();
+        }
 
         // Generate random reference strings
         int[] rssSizes = {10, 15, 20};
